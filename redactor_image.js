@@ -8,7 +8,7 @@
 	
 	Instructions:
 	
-		This plugin edits how images are handled in redactor, adding a width/height and source input boxes, stopping image resizing and selecting in IE, and fixing 100% and centered images and the editing popover. For Redactor II.
+		This plugin edits how images are handled in redactor, adding width and source input boxes, stopping image resizing and selecting in IE, and fixing 100% and centered images and the editing popover. For Redactor II.
 	
 	
 	MIT license:
@@ -206,7 +206,7 @@ $.Redactor.prototype.edit_image = function() {
 					}
 					
 					//if (navigator.appVersion.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident") !== -1) {
-						$image.attr('unselectable','on');
+						//$image.attr('unselectable','on');
 					//}
 					
 					// as link
@@ -343,7 +343,7 @@ $.Redactor.prototype.edit_image = function() {
 					theImage.src = $img.attr("src");
 					
 					//if (navigator.appVersion.indexOf("MSIE") !== -1 || navigator.appVersion.indexOf("Trident") !== -1) {
-				    	$img.attr('unselectable','on');
+				    	//$img.attr('unselectable','on');
 				    //}
 
 					//$figure.append($img);
