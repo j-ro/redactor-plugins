@@ -8,7 +8,7 @@
 	
 	Instructions:
 	
-	This plugin stops Redactor from stripping b, i, span, and font tags, from removing styles when deleting, fixes dropdownb open/close issues, and fixes weird behavior with shift-enter. For use with Redactor II.
+	This plugin stops Redactor from stripping b, i, span, comment, and font tags, from removing styles when deleting, from stripping p and br tags when pasting, fixes dropdownb open/close issues, and fixes weird behavior with shift-enter. For use with Redactor II.
 
 	To use the plugin, simply install it and call it in Redactor's options.
 	
@@ -53,10 +53,10 @@ $.Redactor.prototype.clean = function()
 			//old was
 			//html = html.replace(/<span(.*?[^>]?)id="selection-marker-1"(.*?[^>]?)>​<\/span>/gi, '[[[marker1]]]');
 			//html = html.replace(/<span(.*?[^>]?)id="selection-marker-2"(.*?[^>]?)>​<\/span>/gi, '[[[marker2]]]');
-			html = html.replace(/<span id="selection-marker-1"(.*?[^>]?)>​<\/span>/gi, '[[[marker1]]]');
-			html = html.replace(/<span id="selection-marker-2"(.*?[^>]?)>​<\/span>/gi, '[[[marker2]]]');
-			html = html.replace(/<span id="selection-marker-1"(.*?[^>]?)><\/span>/gi, '[[[marker1]]]');
-			html = html.replace(/<span id="selection-marker-2"(.*?[^>]?)><\/span>/gi, '[[[marker2]]]');
+			//console.log(html);
+			html = html.replace(/<span id="selection-marker-1"([^>]*)>([^<]*)<\/span>/gi, '[[[marker1]]]');
+			html = html.replace(/<span id="selection-marker-2"([^>]*)>([^<]*)<\/span>/gi, '[[[marker2]]]');
+			//console.log(html);
 			
 			//console.log(html);
 	
@@ -87,14 +87,14 @@ $.Redactor.prototype.clean = function()
 			html = this.clean.stripTags(html, tags);
 	
 			// remove html comments
-			html = html.replace(/<!--[\s\S]*?-->/gi, '');
+			//html = html.replace(/<!--[\s\S]*?-->/gi, '');
 	
 			// paragraphize
 			html = this.paragraphize.load(html);
 	
 			// restore markers
-			html = html.replace('[[[marker1]]]', '<span id="selection-marker-1" class="redactor-selection-marker">​</span>');
-			html = html.replace('[[[marker2]]]', '<span id="selection-marker-2" class="redactor-selection-marker">​</span>');
+			html = html.replace('[[[marker1]]]', '<span id="selection-marker-1" class="redactor-selection-marker"></span>');
+			html = html.replace('[[[marker2]]]', '<span id="selection-marker-2" class="redactor-selection-marker"></span>');
 	
 			// empty
 			if (html.search(/^(||\s||<br\s?\/?>||&nbsp;)$/i) !== -1)
@@ -140,10 +140,21 @@ $.Redactor.prototype.clean = function()
 				$(this).contents().unwrap();
 			});
 */
-
+/*
 			$div.find('.redactor-selection-marker, #redactor-insert-marker').remove();
+			$div.html($div.html().replace(/<span id="selection-marker-1"([^>]*)>([^<]*)<\/span>/gi, '').replace(/<span id="selection-marker-2"([^>]*)>([^<]*)<\/span>/gi, ''));
+*/
+			
 
 			html = $div.html();
+			
+			//console.log(html);
+			
+			html = html.replace(/<span id="selection-marker-1"([^>]*)>([^<]*)<\/span>/gi, '');
+			html = html.replace(/<span id="selection-marker-2"([^>]*)>([^<]*)<\/span>/gi, '');
+			
+			//console.log(html);
+			
 
 			// reconvert script tag
 			if (this.opts.script)
@@ -191,11 +202,26 @@ $.Redactor.prototype.clean = function()
 
 			// remove empty paragpraphs
 			html = html.replace(/<p><\/p>/gi, "");
+			
+/*
+			// replace tags
+			html = html.replace(/<b>/gi, "<strong>");
+			html = html.replace(/<\/b>/gi, "</strong>");
+			html = html.replace(/<i>/gi, "<em>");
+			html = html.replace(/<\/i>/gi, "</em>");
+			html = html.replace(/<strike>/gi, "<del>");
+			html = html.replace(/<\/strike>/gi, "</del>");
+			
+			console.log(html);
+*/
+			
+			//console.log(html);
 
 			return html;
 		},
 		onPaste: function(html, data, insert)
 		{
+			//console.log(html);
 			// if paste event
 			if (insert !== true)
 			{
@@ -205,6 +231,8 @@ $.Redactor.prototype.clean = function()
 					html = this.clean.cleanMsWord(html);
 				}
 			}
+			
+			//console.log(html);
 
 			html = $.trim(html);
 
@@ -217,43 +245,78 @@ $.Redactor.prototype.clean = function()
 			}
 			else
 			{
-				html = this.clean.replaceBrToNl(html);
+				//console.log(html);
+				//html = this.clean.replaceBrToNl(html);
+				//console.log(html);
 				html = this.clean.removeTagsInsidePre(html);
+				//console.log(html);
 			}
+			
+			
 
 			// if paste event
 			if (insert !== true)
 			{
+				//console.log(html)
 				html = this.clean.removeSpans(html);
+				//console.log(html)
 				html = this.clean.removeEmptyInlineTags(html);
+				//console.log(html)
 
 				if (data.encode === false)
 				{
 					html = html.replace(/&/g, '&amp;');
+					//console.log(html)
 					html = this.clean.convertTags(html, data);
+					//console.log(html)
 					html = this.clean.getPlainText(html);
+					//console.log(html)
 					html = this.clean.reconvertTags(html, data);
+					//console.log(html)
 				}
 
 			}
+			
+			//console.log(html);
 
 			if (data.text)
 			{
 				html = this.clean.replaceNbspToSpaces(html);
 				html = this.clean.getPlainText(html);
 			}
+			
+			//console.log(html);
 
 			if (data.encode)
 			{
 				html = this.clean.encodeHtml(html);
 			}
+			
+			//console.log(html);
 
-			if (data.paragraphize)
-			{
+			//if (data.paragraphize)
+			//{
 
 				html = this.paragraphize.load(html);
-			}
-
+			//}
+			
+			//console.log(html);
+			
+			//replace tags
+			html = html.replace(/<b>/gi, "<strong>");
+			html = html.replace(/<\/b>/gi, "</strong>");
+			html = html.replace(/<i>/gi, "<em>");
+			html = html.replace(/<\/i>/gi, "</em>");
+			html = html.replace(/<strike>/gi, "<del>");
+			html = html.replace(/<\/strike>/gi, "</del>");
+/*
+			
+			//if pasted code isn't wrapped in a block tag, add a p tag
+			var block_regex = new RegExp(/^(http|https)/i);
+			if ()
+*/
+			
+			//console.log(html);
 			return html;
 
 		},
@@ -399,6 +462,11 @@ $.Redactor.prototype.clean = function()
 			{
 				html = html.replace(/<img src="(.*?)"(.*?[^>])>/gi, '###img src="$1"###');
 			}
+			
+			// br tags
+			html = html.replace(/<br>/gi,'###br###');
+			html = html.replace(/<br\/>/gi,'###br/###');
+			html = html.replace(/<br (.*?)"(.*?[^>])>/gi,'###br/###');
 
 			// plain text
 			if (this.opts.pastePlainText)
@@ -410,6 +478,7 @@ $.Redactor.prototype.clean = function()
 			var blockTags = (data.lists) ? ['ul', 'ol', 'li'] : this.opts.pasteBlockTags;
 
 			var tags;
+			//console.log(this.opts.pasteInlineTags);
 			if (data.block)
 			{
 				tags = (data.inline) ? blockTags.concat(this.opts.pasteInlineTags) : blockTags;
@@ -450,6 +519,10 @@ $.Redactor.prototype.clean = function()
 			{
 				html = html.replace(/###img src="(.*?)"###/gi, '<img src="$1">');
 			}
+			
+			// br tags
+			html = html.replace(/###br###/gi,'<br>');
+			html = html.replace(/###br\/###/gi,'<br/>');
 
 			// plain text
 			if (this.opts.pastePlainText)
@@ -460,6 +533,7 @@ $.Redactor.prototype.clean = function()
 			var blockTags = (data.lists) ? ['ul', 'ol', 'li'] : this.opts.pasteBlockTags;
 
 			var tags;
+			//console.log(this.opts.pasteInlineTags);
 			if (data.block)
 			{
 				tags = (data.inline) ? blockTags.concat(this.opts.pasteInlineTags) : blockTags;
@@ -468,6 +542,8 @@ $.Redactor.prototype.clean = function()
 			{
 				tags = (data.inline) ? this.opts.pasteInlineTags : [];
 			}
+			
+
 
 			var len = tags.length;
 			for (var i = 0; i < len; i++)
@@ -596,7 +672,7 @@ $.Redactor.prototype.clean = function()
 		},
 		restoreSelectionMarkers: function(html)
 		{
-			html = html.replace(/&lt;span id=&quot;selection-marker-([0-9])&quot; class=&quot;redactor-selection-marker&quot;&gt;​&lt;\/span&gt;/g, '<span id="selection-marker-$1" class="redactor-selection-marker">​</span>');
+			html = html.replace(/&lt;span id=&quot;selection-marker-([0-9])&quot; class=&quot;redactor-selection-marker&quot;&gt;&lt;\/span&gt;/g, '<span id="selection-marker-$1" class="redactor-selection-marker"></span>');
 
 			return html;
 		},
@@ -643,8 +719,8 @@ $.Redactor.prototype.clean = function()
 		},
 		removeMarkers: function(html)
 		{
-			//console.log('remove markers');
-			return html.replace(/<span(.*?[^>]?)class="redactor-selection-marker"(.*?[^>]?)>([\w\W]*?)<\/span>/gi, '');
+			return html.replace(/<span id="selection-marker-1"([^>]*)>([^<]*)<\/span>/gi, '').replace(/<span id="selection-marker-2"([^>]*)>([^<]*)<\/span>/gi, '');
+			
 		},
 		removeSpaces: function(html)
 		{
