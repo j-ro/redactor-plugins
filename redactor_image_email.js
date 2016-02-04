@@ -8,7 +8,7 @@
 	
 	Instructions:
 	
-	This plugin edits how images are handled in redactor, adding a width/height input box and source input boxes, fixing 100% widths and editing popovers, storing width/height and alignments as attributes instead of inline styles, stopping image resizing and selecting in IE, and automatically enabling responsive image styles with max-width, all useful for using redactor as a visual editor for email. For Redactor II.
+	This plugin edits how images are handled in redactor, adding width and source input boxes, storing width/height and alignments as attributes instead of inline styles, stopping image resizing and selecting in IE, and automatically enabling responsive image styles with max-width, all useful for using redactor as a visual editor for email. For Redactor II.
 	
 	
 	MIT license:
